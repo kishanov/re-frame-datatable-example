@@ -23,9 +23,9 @@
 (s/def ::domain domains)
 
 
-
 (def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")
-(s/def ::email
+
+(s/def ::email-address
   (s/with-gen
     (s/and string? #(re-matches email-regex %))
     #(gen/fmap (fn [[fname lname domain]]
@@ -35,3 +35,56 @@
                       "@"
                       domain))
                (gen/tuple (s/gen ::first-name) (s/gen ::last-name) (s/gen ::domain)))))
+
+
+(def letters (set (map char (range 97 123))))
+
+
+(s/def ::word
+  (s/with-gen
+    string?
+    #(gen/fmap (fn [chars]
+                 (clojure.string/join chars))
+               (s/gen (s/coll-of letters :min-count 2 :max-count 7)))))
+
+
+(gen/sample (s/gen ::word))
+
+
+(s/def ::subject
+  (s/with-gen
+    string?
+    #(gen/fmap (fn [words]
+                 (->> words
+                      (clojure.string/join \space)
+                      (clojure.string/capitalize)))
+               (s/gen (s/coll-of ::word :min-count 1 :max-count 4)))))
+
+
+(s/def ::body
+  (s/with-gen
+    string?
+    #(gen/fmap (fn [words]
+                 (->> words
+                      (clojure.string/join \space)
+                      (clojure.string/capitalize)))
+               (s/gen (s/coll-of ::word :min-count 1 :max-count 123)))))
+
+
+(gen/sample (s/gen (s/int-in 1394104654000 1482958036000)))
+
+(s/def ::from ::email-address)
+(s/def ::to (s/coll-of ::email-address :min-count 1 :max-count 5 :distinct true))
+(s/def ::date
+  (s/with-gen
+    #(instance? js/Date %)
+    #(gen/fmap (fn [epoch]
+                 (js/Date. epoch))
+               (s/gen (s/int-in 1394104654000 1482958036000)))))
+
+
+(s/def ::email
+  (s/keys :req-un [::to ::from ::subject ::body ::date]))
+
+
+´(s/def ::thread (s/coll-of ::email :min-count 1 :max-count 9))
