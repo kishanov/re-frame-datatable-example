@@ -1,6 +1,7 @@
 (ns re-frame-datatable-example.model
   (:require [cljs.spec :as s]
-            [cljs.spec.impl.gen :as gen]))
+            [cljs.spec.impl.gen :as gen]
+            [clojure.test.check.generators]))
 
 
 (def first-names #{"James" "Mary" "John" "Patricia" "Robert" "Jennifer" "Michael" "Elizabeth" "William" "Linda"
@@ -71,7 +72,6 @@
                (s/gen (s/coll-of ::word :min-count 1 :max-count 123)))))
 
 
-(gen/sample (s/gen (s/int-in 1394104654000 1482958036000)))
 
 (s/def ::from ::email-address)
 (s/def ::to (s/coll-of ::email-address :min-count 1 :max-count 5 :distinct true))
@@ -79,12 +79,15 @@
   (s/with-gen
     #(instance? js/Date %)
     #(gen/fmap (fn [epoch]
-                 (js/Date. epoch))
-               (s/gen (s/int-in 1394104654000 1482958036000)))))
+                 (js/Date. (* (+ epoch (rand-int 20000000)) 1000)))
+               (s/gen (s/int-in 1454104654 1482958036)))))
 
 
 (s/def ::email
   (s/keys :req-un [::to ::from ::subject ::body ::date]))
 
 
-´(s/def ::thread (s/coll-of ::email :min-count 1 :max-count 9))
+(s/def ::thread (s/coll-of ::email :min-count 1 :max-count 9))
+
+
+(def sample-inbox (gen/sample (s/gen ::thread) 42))

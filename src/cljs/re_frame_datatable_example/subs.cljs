@@ -2,7 +2,20 @@
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [re-frame.core :as re-frame]))
 
+
+
 (re-frame/reg-sub
-  ::name
+  ::email-threads
   (fn [db]
-    (:name db)))
+    (:email-threads db)))
+
+
+(re-frame/reg-sub
+  ::threads-digest
+  :<- [::email-threads]
+  (fn [email-threads]
+    (->> email-threads
+         (map (fn [t]
+                {:participants       (map :from t)
+                 :subject            (:subject (first t))
+                 :last-received-date (:date (last t))})))))

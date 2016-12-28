@@ -1,4 +1,6 @@
-(ns re-frame-datatable-example.db)
+(ns re-frame-datatable-example.db
+  (:require [re-frame-datatable-example.model :as model]))
+
 
 (def default-db
-  {:name "re-frame"})
+  {:email-threads model/sample-inbox})
