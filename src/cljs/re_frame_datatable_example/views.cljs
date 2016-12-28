@@ -7,33 +7,30 @@
 
 
 (defn main-panel []
-  [:div
-   (with-out-str
-     (pp/pprint @(re-frame/subscribe [::subs/threads-digest])))]
+  [:div.ui.container
+   [dt/datatable
+    :emails
+    [::subs/threads-digest]
+    [{::dt/column-key   [:participants]
+      ::dt/column-label "From"
+      ::dt/render-fn    (fn [participants]
+                          (let [names (map (comp first #(clojure.string/split % #"@"))
+                                           participants)]
+                            [:span
+                             (if (< 3 (count names))
+                               (str (first names) " .. " (last names))
+                               (clojure.string/join ", " names))]))}
 
-  [dt/datatable
-   :emails
-   [::subs/threads-digest]
-   [{::dt/column-key   [:participants]
-     ::dt/column-label "From"
-     ::dt/render-fn    (fn [participants]
-                         (let [names (map (comp first #(clojure.string/split % #"@"))
-                                          participants)]
-                           [:span
-                            (if (< 3 (count names))
-                              (str (first names) " .. " (last names))
+     {::dt/column-key   [:subject]
+      ::dt/column-label "Subject"}
 
-                              (clojure.string/join ", " names))]))}
+     {::dt/column-key   [:last-received-date]
+      ::dt/column-label "Last received"
+      ::dt/render-fn    (fn [val]
+                          [:span
+                           (.fromNow (js/moment val))])
+      ::dt/sorting      {::dt/enabled? true}}]
 
-    {::dt/column-key   [:subject]
-     ::dt/column-label "Subject"}
-
-    {::dt/column-key   [:last-received-date]
-     ::dt/column-label "Last received"
-     ::dt/render-fn    (fn [val]
-                         [:span
-                          (.fromNow (js/moment val))])
-     ::dt/sorting      {::dt/enabled? true}}]
-
-   {::dt/pagination {::dt/enabled? true
-                     ::dt/per-page 10}}])
+    {::dt/pagination    {::dt/enabled? true
+                         ::dt/per-page 10}
+     ::dt/table-classes ["ui" "table"]}]])

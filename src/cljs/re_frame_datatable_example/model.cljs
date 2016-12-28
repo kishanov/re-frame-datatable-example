@@ -49,9 +49,6 @@
                (s/gen (s/coll-of letters :min-count 2 :max-count 7)))))
 
 
-(gen/sample (s/gen ::word))
-
-
 (s/def ::subject
   (s/with-gen
     string?
@@ -72,7 +69,6 @@
                (s/gen (s/coll-of ::word :min-count 1 :max-count 123)))))
 
 
-
 (s/def ::from ::email-address)
 (s/def ::to (s/coll-of ::email-address :min-count 1 :max-count 5 :distinct true))
 (s/def ::date
@@ -85,8 +81,6 @@
 
 (s/def ::email
   (s/keys :req-un [::to ::from ::subject ::body ::date]))
-
-
 (s/def ::thread (s/coll-of ::email :min-count 1 :max-count 9))
 
 
