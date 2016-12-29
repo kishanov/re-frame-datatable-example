@@ -12,10 +12,10 @@
    [::subs/threads-digest]
    [{::dt/column-key   [:starred?]
      ::dt/column-label " "
-     ::dt/render-fn    (fn [starred?]
-                         (if starred?
-                           [:i.large.yellow.star.icon]
-                           [:i.large.grey.empty.star.icon]))}
+     ::dt/render-fn    (fn [starred? thread]
+                         [:i.large.star.icon
+                          {:on-click #(re-frame/dispatch [::events/change-starred (:id thread)])
+                           :class    (if starred? "yellow" "grey empty")}])}
 
     {::dt/column-key   [:participants]
      ::dt/column-label "From"

@@ -90,8 +90,22 @@
 
 (s/def ::email (s/keys :req-un [::to ::from ::subject ::body ::date]))
 (s/def ::emails (s/coll-of ::email :min-count 1 :max-count 9))
-(s/def ::starred? boolean?)
-(s/def ::thread (s/keys :req-un [::emails ::label ::starred?]))
+
+(s/def ::starred?
+  (s/with-gen
+    boolean?
+    #(s/gen false?)))
+
+(s/def ::id
+  (s/with-gen
+    #(instance? UUID %)
+    #(gen/fmap (fn [[v]] v)
+               (gen/tuple (gen/uuid)))))
 
 
-(def sample-inbox (gen/sample (s/gen ::thread) 42))
+(s/def ::thread (s/keys :req-un [::emails ::label ::starred? ::id]))
+
+
+(def sample-inbox (->> (gen/sample (s/gen ::thread) 42)
+                       (map (fn [o] {(:id o) o}))
+                       (apply merge)))

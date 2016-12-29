@@ -34,6 +34,7 @@
   :<- [::active-label]
   (fn [[email-threads active-label]]
     (->> email-threads
+         (vals)
          (filter (fn [{:keys [label emails starred?]}]
                    (cond
                      (#{:inbox :spam :trash} active-label)
@@ -51,14 +52,14 @@
                      :else
                      false)))
 
-         (map (fn [{:keys [label emails starred?]}]
-                {:participants       (map :from emails)
-                 :subject            (:subject (first emails))
-                 :body-digest        (let [bodies (map :body emails)
-                                           dates (map (comp #(.format (js/moment %) "YYYY-MM-DD") :date) emails)]
-                                       (clojure.string/join \space (interleave bodies dates)))
-                 :last-received-date (:date (last emails))
-                 :label              label
-                 :starred?           starred?}))
+         (map (fn [{:keys [emails] :as thread}]
+                (merge
+                  (select-keys thread [:label :id :starred?])
+                  {:participants       (map :from emails)
+                   :subject            (:subject (first emails))
+                   :body-digest        (let [bodies (map :body emails)
+                                             dates (map (comp #(.format (js/moment %) "YYYY-MM-DD") :date) emails)]
+                                         (clojure.string/join \space (interleave bodies dates)))
+                   :last-received-date (:date (last emails))})))
 
          (sort-by :last-received-date >))))
