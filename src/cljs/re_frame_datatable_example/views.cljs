@@ -6,10 +6,10 @@
             [cljs.pprint :as pp]))
 
 
-(defn main-table []
+(defn main-table [dt-id data-sub-vector]
   [dt/datatable
-   :emails
-   [::subs/threads-digest]
+   dt-id
+   data-sub-vector
    [{::dt/column-key   [:starred?]
      ::dt/column-label " "
      ::dt/render-fn    (fn [starred? thread]
@@ -41,7 +41,7 @@
                           {:style {:text-overflow "ellipsis"
                                    :max-width     "20em"}}
                           (->> digest
-                               (take 60)
+                               (take 40)
                                (apply str))])}
 
     {::dt/column-key   [:last-received-date]
@@ -53,29 +53,65 @@
 
    {::dt/pagination    {::dt/enabled? true
                         ::dt/per-page 10}
+    ::dt/selection     {::dt/enabled? true}
     ::dt/table-classes ["ui" "table"]}])
 
 
 
-(defn labels-panel []
-  (let [labels (re-frame/subscribe [::subs/labels])
-        active-label (re-frame/subscribe [::subs/active-label])]
+(defn labels-panel [active-label]
+  (let [labels (re-frame/subscribe [::subs/labels])]
     [:div.ui.list
      (doall
        (for [{:keys [key title]} @labels]
          ^{:key key}
          [:div.item
-          {:class    (when (= @active-label key) "active")
+          {:class    (when (= active-label key) "active")
            :on-click #(re-frame/dispatch [::events/set-active-label key])}
           title]))]))
 
 
+(defn selected-threads-menu [dt-id data-sub-vector active-label]
+  (let [selected (re-frame/subscribe [::dt/selected-items dt-id data-sub-vector])
+        tooltip-common-attrs {:data-position "bottom center" :data-inverted true}]
+
+    [:div
+     (when-not (empty? @selected)
+       [:div.ui.compact.icon.menu
+        (when (= active-label :inbox)
+          [:div
+           (assoc tooltip-common-attrs :data-tooltip "Archive")
+           [:a.icon.item
+            {:on-click (fn []
+                         (re-frame/dispatch [::events/set-thread-label (map :id @selected) :archived]))}
+            [:i.archive.icon]]])
+
+        (when (not= :spam active-label)
+          [:div
+           (assoc tooltip-common-attrs :data-tooltip "Report spam")
+           [:a.icon.item
+            {:on-click (fn []
+                         (re-frame/dispatch [::events/set-thread-label (map :id @selected) :spam]))}
+            [:i.warning.circle.icon]]])
+
+        (when (not= :trash active-label)
+          [:div
+           (assoc tooltip-common-attrs :data-tooltip "Delete")
+           [:a.icon.item
+            {:on-click (fn []
+                         (re-frame/dispatch [::events/set-thread-label (map :id @selected) :trash]))}
+            [:i.trash.icon]]])])]))
+
 
 (defn main-panel []
-  [:div.ui.container
-   {:style {:margin-top "2em"}}
-   [:div.ui.grid
-    [:div.two.wide.column
-     [labels-panel]]
-    [:div.fourteen.wide.column
-     [main-table]]]])
+  (let [dt-id :email-threads
+        data-sub-vector [::subs/threads-digest]
+        active-label (re-frame/subscribe [::subs/active-label])]
+    [:div.ui.container
+     {:style {:margin-top "2em"}}
+     [:div.ui.grid
+      [:div.two.wide.column
+       [labels-panel @active-label]]
+      [:div.fourteen.wide.column
+       [selected-threads-menu dt-id data-sub-vector @active-label]
+       ^{:key @active-label}
+       [main-table dt-id data-sub-vector]]]]))
