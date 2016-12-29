@@ -25,9 +25,10 @@
 ; TODO(kishanov): update datatable to support dispatch that unselects all selected elements
 (re-frame/reg-event-fx
   ::set-thread-label
-  (fn [cofx [_ thread-ids label-key]]
-    {:db (reduce (fn [ret-cofx thread-id]
-                   (assoc-in ret-cofx [:email-threads thread-id :label] label-key))
-                 (:db cofx)
-                 thread-ids)}))
+  (fn [cofx [_ thread-ids label-key dt-id]]
+    {:db       (reduce (fn [ret-cofx thread-id]
+                         (assoc-in ret-cofx [:email-threads thread-id :label] label-key))
+                       (:db cofx)
+                       thread-ids)
+     :dispatch [::dt/unselect-all-rows dt-id]}))
 

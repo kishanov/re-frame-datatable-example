@@ -70,36 +70,30 @@
           title]))]))
 
 
-(defn selected-threads-menu [dt-id data-sub-vector active-label]
-  (let [selected (re-frame/subscribe [::dt/selected-items dt-id data-sub-vector])
-        tooltip-common-attrs {:data-position "bottom center" :data-inverted true}]
+(defn menu-item [tooltip icon-class email-label selected dt-id]
+  (let [tooltip-common-attrs {:data-position "bottom center" :data-inverted true}]
+    [:div
+     (assoc tooltip-common-attrs :data-tooltip tooltip)
+     [:a.icon.item
+      {:on-click (fn []
+                   (re-frame/dispatch [::events/set-thread-label (map :id selected) email-label dt-id]))}
+      [:i.icon
+       {:class icon-class}]]]))
 
+
+(defn selected-threads-menu [dt-id data-sub-vector active-label]
+  (let [selected (re-frame/subscribe [::dt/selected-items dt-id data-sub-vector])]
     [:div
      (when-not (empty? @selected)
        [:div.ui.compact.icon.menu
         (when (= active-label :inbox)
-          [:div
-           (assoc tooltip-common-attrs :data-tooltip "Archive")
-           [:a.icon.item
-            {:on-click (fn []
-                         (re-frame/dispatch [::events/set-thread-label (map :id @selected) :archived]))}
-            [:i.archive.icon]]])
+          [menu-item "Archive" "archive" :archived @selected dt-id])
 
         (when (not= :spam active-label)
-          [:div
-           (assoc tooltip-common-attrs :data-tooltip "Report spam")
-           [:a.icon.item
-            {:on-click (fn []
-                         (re-frame/dispatch [::events/set-thread-label (map :id @selected) :spam]))}
-            [:i.warning.circle.icon]]])
+          [menu-item "Report spam" "warning circle" :spam @selected dt-id])
 
         (when (not= :trash active-label)
-          [:div
-           (assoc tooltip-common-attrs :data-tooltip "Delete")
-           [:a.icon.item
-            {:on-click (fn []
-                         (re-frame/dispatch [::events/set-thread-label (map :id @selected) :trash]))}
-            [:i.trash.icon]]])])]))
+          [menu-item "Delete" "trash" :trash @selected dt-id])])]))
 
 
 (defn main-panel []
