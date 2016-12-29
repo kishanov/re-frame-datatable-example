@@ -10,7 +10,14 @@
   [dt/datatable
    :emails
    [::subs/threads-digest]
-   [{::dt/column-key   [:participants]
+   [{::dt/column-key   [:starred?]
+     ::dt/column-label " "
+     ::dt/render-fn    (fn [starred?]
+                         (if starred?
+                           [:i.large.yellow.star.icon]
+                           [:i.large.grey.empty.star.icon]))}
+
+    {::dt/column-key   [:participants]
      ::dt/column-label "From"
      ::dt/render-fn    (fn [participants]
                          (let [names (map (comp first #(clojure.string/split % #"@"))

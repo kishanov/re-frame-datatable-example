@@ -90,7 +90,8 @@
 
 (s/def ::email (s/keys :req-un [::to ::from ::subject ::body ::date]))
 (s/def ::emails (s/coll-of ::email :min-count 1 :max-count 9))
-(s/def ::thread (s/keys :req-un [::emails ::label]))
+(s/def ::starred? boolean?)
+(s/def ::thread (s/keys :req-un [::emails ::label ::starred?]))
 
 
 (def sample-inbox (gen/sample (s/gen ::thread) 42))

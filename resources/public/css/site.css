@@ -10,3 +10,8 @@ div.ui.list div.item:hover {
     cursor: pointer;
     background-color: #eee;
 }
+
+i.star.icon:hover {
+    text-shadow: 0 0 2px darkgrey;
+    cursor: pointer;
+}
