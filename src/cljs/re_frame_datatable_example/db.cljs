@@ -3,4 +3,6 @@
 
 
 (def default-db
-  {:email-threads model/sample-inbox})
+  {:email-threads model/sample-inbox
+   :labels        model/labels
+   :active-label  (:key (first model/labels))})

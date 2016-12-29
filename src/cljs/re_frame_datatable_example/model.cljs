@@ -15,6 +15,15 @@
                   "Clark" "Rodriguez" "Lewis" "Lee" "Walker" "Hall" "Allen" "Young" "Hernandez" "King" "Wright"
                   "Lopez" "Hill" "Scott" "Green" "Adams" "Baker" "Gonzalez" "Nelson" "Carter"})
 
+(def labels [{:title "Inbox" :key :inbox}
+             {:title "Archived" :key :archived}
+             {:title "Spam" :key :spam}
+             {:title "Trash" :key :trash}])
+
+(def default-label-keys (set (map :key labels)))
+
+(s/def ::label default-label-keys)
+
 
 (def domains #{"gmail.com" "yahoo.com" "hotmail.com" "outlook.com" "inbox.com" "mail.com"})
 
@@ -75,13 +84,13 @@
   (s/with-gen
     #(instance? js/Date %)
     #(gen/fmap (fn [epoch]
-                 (js/Date. (* (+ epoch (rand-int 20000000)) 1000)))
+                 (js/Date. (* (+ epoch (rand-int 1000000)) 1000)))
                (s/gen (s/int-in 1454104654 1482958036)))))
 
 
-(s/def ::email
-  (s/keys :req-un [::to ::from ::subject ::body ::date]))
-(s/def ::thread (s/coll-of ::email :min-count 1 :max-count 9))
+(s/def ::email (s/keys :req-un [::to ::from ::subject ::body ::date]))
+(s/def ::emails (s/coll-of ::email :min-count 1 :max-count 9))
+(s/def ::thread (s/keys :req-un [::emails ::label]))
 
 
 (def sample-inbox (gen/sample (s/gen ::thread) 42))

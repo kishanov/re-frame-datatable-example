@@ -7,3 +7,9 @@
   ::initialize-db
   (fn [_ _]
     db/default-db))
+
+
+(re-frame/reg-event-db
+  ::set-active-label
+  (fn [db [_ label-key]]
+    (assoc db :active-label label-key)))
