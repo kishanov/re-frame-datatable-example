@@ -20,12 +20,16 @@
     {::dt/column-key   [:participants]
      ::dt/column-label "From"
      ::dt/render-fn    (fn [participants]
-                         (let [names (map (comp first #(clojure.string/split % #"@"))
-                                          participants)]
+                         (let [names (->> participants
+                                          (map (comp first #(clojure.string/split % #"@")))
+                                          (distinct))]
                            [:span
                             (if (< 3 (count names))
                               (str (first names) " .. " (last names))
-                              (clojure.string/join ", " names))]))}
+                              (clojure.string/join ", " names))
+
+                            (when (< 1 (count participants))
+                              [:span " (" (count participants) ")"])]))}
 
     {::dt/column-key   [:subject]
      ::dt/column-label "Subject"}
