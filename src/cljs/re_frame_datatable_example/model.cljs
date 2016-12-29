@@ -75,7 +75,7 @@
                  (->> words
                       (clojure.string/join \space)
                       (clojure.string/capitalize)))
-               (s/gen (s/coll-of ::word :min-count 1 :max-count 123)))))
+               (s/gen (s/coll-of ::word :min-count 1 :max-count 10)))))
 
 
 (s/def ::from ::email-address)

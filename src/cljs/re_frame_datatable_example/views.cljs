@@ -34,11 +34,21 @@
     {::dt/column-key   [:subject]
      ::dt/column-label "Subject"}
 
+    {::dt/column-key   [:body-digest]
+     ::dt/column-label "Digest"
+     ::dt/render-fn    (fn [digest]
+                         [:span.muted
+                          {:style {:text-overflow "ellipsis"
+                                   :max-width     "20em"}}
+                          (->> digest
+                               (take 60)
+                               (apply str))])}
+
     {::dt/column-key   [:last-received-date]
      ::dt/column-label "Last received"
      ::dt/render-fn    (fn [val]
                          [:span
-                          (.fromNow (js/moment val))])
+                          (.format (js/moment val) "YYYY-MM-DD")])
      ::dt/sorting      {::dt/enabled? true}}]
 
    {::dt/pagination    {::dt/enabled? true
