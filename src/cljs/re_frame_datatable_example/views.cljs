@@ -2,20 +2,28 @@
   (:require [re-frame.core :as re-frame]
             [re-frame-datatable-example.subs :as subs]
             [re-frame-datatable-example.events :as events]
-            [re-frame-datatable.core :as dt]
-            [cljs.pprint :as pp]))
+            [re-frame-datatable.core :as dt]))
 
 
-(defn main-table [dt-id data-sub-vector]
+
+(defn main-table [dt-id data-sub-vector active-label]
   [dt/datatable
    dt-id
    data-sub-vector
-   [{::dt/column-key   [:starred?]
-     ::dt/column-label " "
-     ::dt/render-fn    (fn [starred? thread]
-                         [:i.large.star.icon
-                          {:on-click #(re-frame/dispatch [::events/change-starred (:id thread)])
-                           :class    (if starred? "yellow" "grey empty")}])}
+   [(if (= active-label :trash)
+      {::dt/column-key   [:id]
+       ::dt/column-label " "
+       ::dt/render-fn    (fn [id]
+                           [:i.large.grey.trash.icon
+                            {:on-click #(re-frame/dispatch [::events/delete-forever id])
+                             :style    {:cursor "pointer"}}])}
+
+      {::dt/column-key   [:starred?]
+       ::dt/column-label " "
+       ::dt/render-fn    (fn [starred? thread]
+                           [:i.large.star.icon
+                            {:on-click #(re-frame/dispatch [::events/change-starred (:id thread)])
+                             :class    (if starred? "yellow" "grey empty")}])})
 
     {::dt/column-key   [:participants]
      ::dt/column-label "From"
@@ -70,6 +78,7 @@
           title]))]))
 
 
+
 (defn menu-item [tooltip icon-class email-label selected dt-id]
   (let [tooltip-common-attrs {:data-position "bottom center" :data-inverted true}]
     [:div
@@ -79,6 +88,7 @@
                    (re-frame/dispatch [::events/set-thread-label (map :id selected) email-label dt-id]))}
       [:i.icon
        {:class icon-class}]]]))
+
 
 
 (defn selected-threads-menu [dt-id data-sub-vector active-label]
@@ -94,6 +104,7 @@
 
         (when (not= :trash active-label)
           [menu-item "Delete" "trash" :trash @selected dt-id])])]))
+
 
 
 (defn gmail-like-pagination [db-id data-sub]
@@ -143,11 +154,11 @@
        [:div.fourteen.wide.column
         [:div.ui.two.column.grid
          [:div.row
-          [:div.column
+          [:div.column {:style {:padding-left 0}}
            [selected-threads-menu dt-id data-sub-vector @active-label]]
-          [:div.right.aligned.column
+          [:div.right.aligned.column {:style {:padding-right 0}}
            [gmail-like-pagination dt-id data-sub-vector]]]
 
          [:div.two.column.row
           ^{:key @active-label}
-          [main-table dt-id data-sub-vector]]]]]]]))
+          [main-table dt-id data-sub-vector @active-label]]]]]]]))

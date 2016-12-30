@@ -22,7 +22,13 @@
     (update-in db [:email-threads thread-id :starred?] not)))
 
 
-; TODO(kishanov): update datatable to support dispatch that unselects all selected elements
+(re-frame/reg-event-db
+  ::delete-forever
+  (fn [db [_ thread-id]]
+    (update-in db [:email-threads] dissoc thread-id)))
+
+
+
 (re-frame/reg-event-fx
   ::set-thread-label
   (fn [cofx [_ thread-ids label-key dt-id]]
