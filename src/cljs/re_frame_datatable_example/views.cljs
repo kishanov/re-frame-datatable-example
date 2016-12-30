@@ -157,6 +157,15 @@
 
     [:div.ui.container
      {:style {:margin-top "2em"}}
+
+     [:h1.ui.header {:style {:padding 0}}
+      "re-frame-datatable Example App"
+      [:div.ui.right.floated.main.menu
+       [:a.item {:href "https://github.com/kishanov/re-frame-datatable-example"}
+        [:i.github.icon]]]]
+
+     [:hr {:style {:margin-bottom "2em"}}]
+
      [:div.ui.grid
       [:div.row
        [:div.two.wide.column

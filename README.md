@@ -3,6 +3,9 @@
 A [re-frame](https://github.com/Day8/re-frame) application that shows most of the capabilities of [re-frame-datatable](https://github.com/kishanov/re-frame-datatable)
 using GMail-like interface as an example.
 
+This application is available via GitHub Pages @ https://kishanov.github.io/re-frame-datatable-example/
+
+
 ## Features
 
 * Uses most of the features of DataTable as described at [Documentation Website](https://kishanov.github.io/re-frame-datatable/)
