@@ -96,16 +96,58 @@
           [menu-item "Delete" "trash" :trash @selected dt-id])])]))
 
 
+(defn gmail-like-pagination [db-id data-sub]
+  (let [pagination-state (re-frame/subscribe [::re-frame-datatable.core/pagination-state db-id data-sub])]
+    (fn []
+      (let [{:keys [::re-frame-datatable.core/cur-page ::re-frame-datatable.core/pages]} @pagination-state
+            total-pages (count pages)
+            next-enabled? (< cur-page (dec total-pages))
+            prev-enabled? (pos? cur-page)]
+
+        [:div
+         [:div {:style {:display      "inline-block"
+                        :margin-right ".5em"}}
+          [:strong
+           (str (inc (first (get pages cur-page))) "-" (inc (second (get pages cur-page))))]
+          [:span " of "]
+          [:strong (inc (second (last pages)))]]
+
+         [:div.ui.pagination.mini.menu
+          [:a.item
+           {:on-click #(when prev-enabled?
+                         (re-frame/dispatch [::re-frame-datatable.core/select-prev-page db-id @pagination-state]))
+            :class    (when-not prev-enabled? "disabled")}
+           [:i.left.chevron.icon]]
+
+          [:a.item
+           {:on-click #(when next-enabled?
+                         (re-frame/dispatch [::re-frame-datatable.core/select-next-page db-id @pagination-state]))
+            :class    (when-not next-enabled? "disabled")}
+           [:i.right.chevron.icon]]]]))))
+
+
+
 (defn main-panel []
   (let [dt-id :email-threads
         data-sub-vector [::subs/threads-digest]
         active-label (re-frame/subscribe [::subs/active-label])]
+
     [:div.ui.container
      {:style {:margin-top "2em"}}
      [:div.ui.grid
-      [:div.two.wide.column
-       [labels-panel @active-label]]
-      [:div.fourteen.wide.column
-       [selected-threads-menu dt-id data-sub-vector @active-label]
-       ^{:key @active-label}
-       [main-table dt-id data-sub-vector]]]]))
+      [:div.row
+       [:div.two.wide.column
+        [labels-panel @active-label]]
+
+
+       [:div.fourteen.wide.column
+        [:div.ui.two.column.grid
+         [:div.row
+          [:div.column
+           [selected-threads-menu dt-id data-sub-vector @active-label]]
+          [:div.right.aligned.column
+           [gmail-like-pagination dt-id data-sub-vector]]]
+
+         [:div.two.column.row
+          ^{:key @active-label}
+          [main-table dt-id data-sub-vector]]]]]]]))

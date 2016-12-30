@@ -31,4 +31,3 @@
                        (:db cofx)
                        thread-ids)
      :dispatch [::dt/unselect-all-rows dt-id]}))
-
