@@ -15,6 +15,11 @@
                   "Clark" "Rodriguez" "Lewis" "Lee" "Walker" "Hall" "Allen" "Young" "Hernandez" "King" "Wright"
                   "Lopez" "Hill" "Scott" "Green" "Adams" "Baker" "Gonzalez" "Nelson" "Carter"})
 
+(def words (->> "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                (re-seq #"[A-Za-z]+")
+                (map clojure.string/lower-case)
+                (set)))
+
 (def labels [{:title "Inbox" :key :inbox}
              {:title "Archived" :key :archived}
              {:title "Spam" :key :spam}
@@ -47,15 +52,7 @@
                (gen/tuple (s/gen ::first-name) (s/gen ::last-name) (s/gen ::domain)))))
 
 
-(def letters (set (map char (range 97 123))))
-
-
-(s/def ::word
-  (s/with-gen
-    string?
-    #(gen/fmap (fn [chars]
-                 (clojure.string/join chars))
-               (s/gen (s/coll-of letters :min-count 2 :max-count 7)))))
+(s/def ::word words)
 
 
 (s/def ::subject
