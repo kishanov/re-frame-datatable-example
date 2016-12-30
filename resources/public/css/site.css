@@ -19,3 +19,21 @@ i.star.icon:hover {
 .muted {
     color: grey !important;
 }
+
+table.re-frame-datatable > thead th.sorted-by:after {
+    display: inline-block;
+}
+
+table.re-frame-datatable > thead th.sorted-by.desc:after {
+    content: '\f0d7';
+}
+
+table.re-frame-datatable > thead th.asc:after {
+    content: '\f0d8';
+}
+
+table.re-frame-datatable > thead th:after {
+    display: none;
+    font-family: Icons;
+    margin-left: .5em;
+}
