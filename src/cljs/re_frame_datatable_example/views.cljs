@@ -59,10 +59,16 @@
                           (.format (js/moment val) "YYYY-MM-DD")])
      ::dt/sorting      {::dt/enabled? true}}]
 
-   {::dt/pagination    {::dt/enabled? true
-                        ::dt/per-page 10}
-    ::dt/selection     {::dt/enabled? true}
-    ::dt/table-classes ["ui" "table"]}])
+   {::dt/pagination            {::dt/enabled? true
+                                ::dt/per-page 10}
+    ::dt/selection             {::dt/enabled? true}
+    ::dt/table-classes         ["ui" "table"]
+    ::dt/empty-tbody-component (fn []
+                                 [:span "No starred messages. Stars let you give messages a special status to make them easier to find. To star a message, click on the star outline beside any message or conversation."])
+    ::dt/footer-component      (fn []
+                                 [:tr
+                                  [:th {:col-span 6}
+                                   [:strong "Total selected: " (count @(re-frame/subscribe [::dt/selected-items dt-id data-sub-vector]))]]])}])
 
 
 
