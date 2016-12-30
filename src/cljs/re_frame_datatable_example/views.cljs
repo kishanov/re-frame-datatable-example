@@ -68,7 +68,13 @@
     ::dt/footer-component      (fn []
                                  [:tr
                                   [:th {:col-span 6}
-                                   [:strong "Total selected: " (count @(re-frame/subscribe [::dt/selected-items dt-id data-sub-vector]))]]])}])
+                                   [:strong "Total selected: " (count @(re-frame/subscribe [::dt/selected-items dt-id data-sub-vector]))]]])
+    ::dt/tr-class-fn           (fn [thread]
+                                 (let [selected-ids (->> @(re-frame/subscribe [::dt/selected-items dt-id data-sub-vector])
+                                                         (map :id)
+                                                         (set))]
+                                   [(when (selected-ids (:id thread))
+                                      "warning")]))}])
 
 
 
