@@ -103,6 +103,6 @@
 (s/def ::thread (s/keys :req-un [::emails ::label ::starred? ::id]))
 
 
-(def sample-inbox (->> (gen/sample (s/gen ::thread) 42)
+(def sample-inbox (->> (gen/sample (s/gen ::thread) 100)
                        (map (fn [o] {(:id o) o}))
                        (apply merge)))
